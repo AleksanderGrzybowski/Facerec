@@ -17,4 +17,5 @@ task run(type:JavaExec) {
 
 dependencies {
     compile 'com.sparkjava:spark-core:2.3'
+    compile 'com.google.code.gson:gson:2.6.2'
 }
