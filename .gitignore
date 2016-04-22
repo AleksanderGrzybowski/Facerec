@@ -3,3 +3,9 @@ recognize
 train
 core/photos/*
 !core/photos/.gitkeep
+
+web/.idea
+web/*.iml
+web/build
+web/.gradle
+
