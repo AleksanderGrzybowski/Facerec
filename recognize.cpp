@@ -37,6 +37,11 @@ int main(int argc, const char *argv[]) {
     vector<Rect_<int>> faces;
     haar_cascade.detectMultiScale(gray, faces);
 
+    if (faces.size() == 0) {
+        cout << "no faces" << endl;
+        return 1;
+    }
+
     for (auto& face_i: faces) {
         Mat face = gray(face_i);
         Mat face_resized;
