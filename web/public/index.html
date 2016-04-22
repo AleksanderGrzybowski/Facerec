@@ -4,15 +4,30 @@
     <meta charset="UTF-8">
     <title>Facerec</title>
 
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" type="text/css"/>
+
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/webcamjs/webcam.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
 </head>
 <body>
 
-<h1>Hello there</h1>
-<div id="camera" style="width:320px; height:240px;"></div>
+<div class="container container-fluid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="camera" style="width:640px; height:480px; margin: 0 auto;"></div>
+        </div>
+    </div>
 
-<button id="trigger">Go!</button>
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-xs-12">
+            <button class="btn btn-primary btn-block" id="trigger" style="font-size: 50pt;">Capture</button>
+        </div>
+    </div>
+
+    <div class="alert" id="result-target" style="font-size: 30pt; margin-top: 20px;">
+    </div>
+</div>
 
 <script src="app.js"></script>
 </body>
