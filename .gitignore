@@ -9,3 +9,4 @@ web/*.iml
 web/build
 web/.gradle
 
+web/public/bower_components/

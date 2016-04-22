@@ -14,7 +14,9 @@ public class Adapter {
         fos.write(data);
         fos.close();
 
-        Process process = new ProcessBuilder(Arrays.asList("../core/recognize", tempFile.getAbsolutePath())).start();
+        Process process = new ProcessBuilder(Arrays.asList("../core/recognize", tempFile.getAbsolutePath()))
+                .directory(new File("../core"))
+                .start();
         process.waitFor();
         
         if (process.exitValue() != 0) {

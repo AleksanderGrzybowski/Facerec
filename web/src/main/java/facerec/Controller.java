@@ -9,6 +9,7 @@ import java.util.Base64;
 public class Controller {
     public static void main(String[] args) {
         Spark.externalStaticFileLocation(System.getProperty("user.dir") + File.separator + "public");
+        Spark.secure("ssl.p12", "", null, "");
         
         Spark.post("/recognize", (req, res) -> {
             PhotoDto dto = new Gson().fromJson(req.body(), PhotoDto.class);

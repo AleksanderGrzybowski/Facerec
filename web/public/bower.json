@@ -1,0 +1,18 @@
+{
+  "name": "Facerec",
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "webcamjs": "^1.0.6",
+    "jquery": "^2.2.3"
+  }
+}
