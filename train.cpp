@@ -70,7 +70,7 @@ void load_photos(string basedir, vector<Mat>& images, vector<int>& labels) {
     cout << "Images loaded" << endl;
 }
 
-const string basedir = "photos"
+const string basedir = "photos";
 const string model_filename = "model.yml";
 
 int main(int argc, const char *argv[]) {
