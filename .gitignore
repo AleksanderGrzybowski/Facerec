@@ -1,12 +1,12 @@
 *.yml
-recognize
-train
+core/recognize
+core/train
 core/photos/*
 !core/photos/.gitkeep
 
-web/.idea
-web/*.iml
-web/build
-web/.gradle
+.idea
+*.iml
+build
+.gradle
 
-web/public/bower_components/
+public/bower_components/
