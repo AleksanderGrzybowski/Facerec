@@ -1,5 +1,5 @@
 *.yml
 recognize
 train
-photos/*
-!photos/.gitkeep
+core/photos/*
+!core/photos/.gitkeep
