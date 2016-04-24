@@ -16,6 +16,9 @@ $trigger.click(function triggered() {
             url: '/recognize',
             data: JSON.stringify({data: extractData(dataUri)}),
             success: successHandler,
+            error: function () {
+                alert('Server error');
+            },
             contentType: 'application/json',
             dataType: 'json'
         });
@@ -32,6 +35,10 @@ function successHandler(response) {
     $trigger.removeClass('disabled').text('Capture!');
 }
 
+/**
+ * Strip the prefix of data url and preserve
+ * only base64 data.
+ */
 function extractData(dataUri) {
     return dataUri.substring(23);
 }
