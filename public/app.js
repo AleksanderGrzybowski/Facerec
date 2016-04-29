@@ -14,7 +14,10 @@ $trigger.click(function triggered() {
         $.ajax({
             type: 'POST',
             url: '/recognize',
-            data: JSON.stringify({data: extractData(dataUri)}),
+            data: JSON.stringify({
+                data: extractData(dataUri),
+                method: $('option:selected').data('code')
+            }),
             success: successHandler,
             error: function () {
                 alert('Server error');
