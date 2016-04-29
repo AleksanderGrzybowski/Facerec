@@ -19,7 +19,7 @@ vector<string> list_files(string directory) {
     struct dirent *ent;
     if ((dir = opendir (directory.c_str())) != NULL) {
         while ((ent = readdir(dir)) != NULL) {
-            if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) continue;
+            if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..") || !strcmp(ent->d_name, ".gitkeep")) continue;
             list.push_back(ent->d_name);
         }
         closedir (dir);
