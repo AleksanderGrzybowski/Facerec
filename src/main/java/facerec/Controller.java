@@ -16,11 +16,11 @@ public class Controller {
         Spark.secure(CERT_PATH, "", null, "");
         
         Spark.post("/recognize", (req, res) -> {
-            PhotoDto dto = new Gson().fromJson(req.body(), PhotoDto.class);
+            SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);
     
             byte[] bytes = Base64.getDecoder().decode(dto.data);
             
-            return Adapter.recognize(bytes);
+            return Adapter.recognize(bytes, dto.method);
         }, new JsonTransformer());
     }
 }

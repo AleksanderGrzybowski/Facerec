@@ -2,17 +2,23 @@ package facerec;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 
 public class Adapter {
     
     public static final String REGOGNIZE_BINARY_PATH = "./recognize";
     public static final String RECOGNIZE_BINARY_BASEDIR = "core";
     
-    public static RecoStatus recognize(byte[] data) {
+    public static RecoStatus recognize(byte[] data, String method) {
         File tempFile = writeTempFile(data);
+        List<String> params = Arrays.asList(
+                REGOGNIZE_BINARY_PATH,
+                tempFile.getAbsolutePath(),
+                method
+        );
         
         try {
-            Process process = new ProcessBuilder(Arrays.asList(REGOGNIZE_BINARY_PATH, tempFile.getAbsolutePath()))
+            Process process = new ProcessBuilder(params)
                     .directory(new File(RECOGNIZE_BINARY_BASEDIR))
                     .start();
             process.waitFor();
