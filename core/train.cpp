@@ -71,7 +71,8 @@ void load_photos(string basedir, vector<Mat>& images, vector<int>& labels) {
 }
 
 const string basedir = "photos";
-const string model_filename = "model.yml";
+
+const vector<string> model_filenames = {"model-ef.yml", "model-ff.yml", "model-lbph.yml"};
 
 int main(int argc, const char *argv[]) {
 
@@ -80,13 +81,37 @@ int main(int argc, const char *argv[]) {
 
     load_photos(basedir, images, labels);
 
-    Ptr<FaceRecognizer> model = createEigenFaceRecognizer();
+    Ptr<FaceRecognizer> model;
+    
+    
+    // EF
+    model = createEigenFaceRecognizer();
 
-    cout << "Training starts" << endl;
+    cout << "EF Training starts" << endl;
     model->train(images, labels);
 
-    cout << "Training finished, saving" << endl;
-    model->save(model_filename);
+    cout << "EF Training finished, saving" << endl;
+    model->save(model_filenames[0]);
+    
+    
+    // FF
+    model = createFisherFaceRecognizer();
+
+    cout << "FF Training starts" << endl;
+    model->train(images, labels);
+
+    cout << "FF Training finished, saving" << endl;
+    model->save(model_filenames[1]);
+    
+    
+    // LBPH
+    model = createLBPHFaceRecognizer();
+
+    cout << "LBPH Training starts" << endl;
+    model->train(images, labels);
+
+    cout << "LBPH Training finished, saving" << endl;
+    model->save(model_filenames[2]);
 
     return 0;
 }

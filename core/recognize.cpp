@@ -15,15 +15,30 @@ using namespace std;
 const string fn_haar = "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
 const int im_width = 92;
 const int im_height = 112;
-const string model_filename = "model.yml";
 
 int main(int argc, const char *argv[]) {
-    if (argc != 2) {
+    if (argc != 3) {
         throw runtime_error("Filename not given");
     }
     string input_filename = string(argv[1]);
+    string method = string(argv[2]);
 
-    Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
+    Ptr<FaceRecognizer> model;
+    string model_filename;
+    
+    if (method == "ef") {
+    	model = createEigenFaceRecognizer();
+    	model_filename = "model-ef.yml";
+    } else if (method == "ff") {
+    	model = createFisherFaceRecognizer();
+    	model_filename = "model-ff.yml";
+    } else if (method == "lbph") {
+    	model = createLBPHFaceRecognizer();
+    	model_filename = "model-lbph.yml";
+    } else {
+    	throw runtime_error("Wrong method name");
+    }
+    
     model->load(model_filename);
 
     CascadeClassifier haar_cascade;
