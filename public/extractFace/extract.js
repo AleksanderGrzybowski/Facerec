@@ -25,6 +25,11 @@ function successHandler(response) {
     console.log(response);
     var uri = "data:image/jpeg;base64," + response.data;
     var $img = $('<img/>').attr('src', uri);
+    
+    $img.dblclick(function () {
+        $(this).remove();
+    });
+    
     $('#photos').append($img);
 
 }
