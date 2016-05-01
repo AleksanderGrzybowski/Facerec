@@ -22,5 +22,13 @@ public class Controller {
             
             return Adapter.recognize(bytes, dto.method);
         }, new JsonTransformer());
+    
+        Spark.post("/extractFace", (req, res) -> {
+            ImageDto dto = new Gson().fromJson(req.body(), ImageDto.class);
+        
+            byte[] bytes = Base64.getDecoder().decode(dto.data);
+        
+            return Adapter.extractFace(bytes);
+        }, new JsonTransformer());
     }
 }
