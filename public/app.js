@@ -15,7 +15,7 @@ $trigger.click(function triggered() {
             type: 'POST',
             url: '/recognize',
             data: JSON.stringify({
-                data: extractData(dataUri),
+                data: extractDataFromDataUri(dataUri),
                 method: $('option:selected').data('code')
             }),
             success: successHandler,
@@ -36,12 +36,4 @@ function successHandler(response) {
     }
 
     $trigger.removeClass('disabled').text('Capture!');
-}
-
-/**
- * Strip the prefix of data url and preserve
- * only base64 data.
- */
-function extractData(dataUri) {
-    return dataUri.substring(23);
 }

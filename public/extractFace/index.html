@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facerec</title>
+
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css" type="text/css"/>
+
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/webcamjs/webcam.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+    <script src="../common.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row" style="margin-bottom: 40px;">
+        <div class="col-md-6">
+            <div id="camera" style="width:320px; height:240px; margin: 0 auto;"></div>
+        </div>
+        
+        <div class="col-md-6">
+            <h1>Extracting and cropping faces</h1>
+            
+            <ul>
+                <li>Make sure that photo is not (over/under)lit</li>
+                <li>Double click removes image</li>
+                <li>To save: right click and so on...</li>
+            </ul>
+            
+            <button class="btn btn-primary btn-block" id="trigger">Snap!</button>
+        </div>
+    </div>
+   
+    <div id="photos">
+
+    </div>
+</div>
+
+
+<script src="extract.js"></script>
+</body>
+</html>

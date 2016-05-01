@@ -1,33 +1,58 @@
 package facerec;
 
+import facerec.extract.FaceExtractDto;
+import facerec.recognize.RecoStatusDto;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
 public class Adapter {
     
-    public static final String REGOGNIZE_BINARY_PATH = "./recognize";
-    public static final String RECOGNIZE_BINARY_BASEDIR = "core";
-    
-    public static RecoStatus recognize(byte[] data, String method) {
+    public static RecoStatusDto recognize(byte[] data, String method) {
         File tempFile = writeTempFile(data);
         List<String> params = Arrays.asList(
-                REGOGNIZE_BINARY_PATH,
+                Config.REGOGNIZE_BINARY_PATH,
                 tempFile.getAbsolutePath(),
                 method
         );
         
         try {
             Process process = new ProcessBuilder(params)
-                    .directory(new File(RECOGNIZE_BINARY_BASEDIR))
+                    .directory(new File(Config.CORE_DIR))
                     .start();
             process.waitFor();
             
             if (process.exitValue() != 0) {
-                return RecoStatus.failure();
+                return RecoStatusDto.failure();
             } else {
                 String line = new BufferedReader(new InputStreamReader(process.getInputStream())).readLine();
-                return RecoStatus.success(Integer.parseInt(line));
+                return RecoStatusDto.success(Integer.parseInt(line));
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error in backend process", e);
+        }
+    }
+    
+    public static FaceExtractDto extractFace(byte[] data) {
+        File tempFile = writeTempFile(data);
+        List<String> params = Arrays.asList(
+                Config.EXTRACT_FACE_BINARY_PATH,
+                tempFile.getAbsolutePath()
+        );
+        
+        try {
+            Process process = new ProcessBuilder(params)
+                    .directory(new File(Config.CORE_DIR))
+                    .start();
+            process.waitFor();
+            
+            if (process.exitValue() != 0) {
+                return FaceExtractDto.failure();
+            } else {
+                byte[] extracted = IOUtils.toByteArray(process.getInputStream());
+                return FaceExtractDto.success(extracted);
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error in backend process", e);
@@ -36,7 +61,7 @@ public class Adapter {
     
     private static File writeTempFile(byte[] data) {
         try {
-            File file = File.createTempFile("facerec-tmp", "jpg");
+            File file = File.createTempFile("facerec-tmp", ".jpg");
             
             FileOutputStream stream = new FileOutputStream(file.getAbsolutePath());
             stream.write(data);

@@ -1,26 +1,28 @@
 package facerec;
 
 import com.google.gson.Gson;
+import facerec.extract.ImageDto;
+import facerec.recognize.SampleDto;
 import spark.Spark;
 
-import java.io.File;
 import java.util.Base64;
 
 public class Controller {
     
-    private static final String CERT_PATH = "ssl.p12";
-    private static final String PUBLIC_HTML = System.getProperty("user.dir") + File.separator + "public";
-    
     public static void main(String[] args) {
-        Spark.externalStaticFileLocation(PUBLIC_HTML);
-        Spark.secure(CERT_PATH, "", null, "");
+        Spark.externalStaticFileLocation(Config.PUBLIC_HTML);
+        Spark.secure(Config.CERT_PATH, "", null, "");
         
         Spark.post("/recognize", (req, res) -> {
             SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);
     
-            byte[] bytes = Base64.getDecoder().decode(dto.data);
-            
-            return Adapter.recognize(bytes, dto.method);
+            return Adapter.recognize(Base64.getDecoder().decode(dto.data), dto.method);
+        }, new JsonTransformer());
+    
+        Spark.post("/extractFace", (req, res) -> {
+            ImageDto dto = new Gson().fromJson(req.body(), ImageDto.class);
+    
+            return Adapter.extractFace(Base64.getDecoder().decode(dto.data));
         }, new JsonTransformer());
     }
 }

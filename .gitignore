@@ -1,6 +1,7 @@
 *.yml
 core/recognize
 core/train
+core/extract_face
 core/photos/*
 !core/photos/.gitkeep
 
