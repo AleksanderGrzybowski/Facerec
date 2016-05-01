@@ -1,4 +1,4 @@
-package facerec;
+package facerec.recognize;
 
 public class SampleDto {
     public final String data;

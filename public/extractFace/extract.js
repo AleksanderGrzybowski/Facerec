@@ -9,7 +9,7 @@ $trigger.click(function triggered() {
             type: 'POST',
             url: '/extractFace',
             data: JSON.stringify({
-                data: extractData(dataUri)
+                data: extractDataFromDataUri(dataUri)
             }),
             success: successHandler,
             error: function () {
@@ -22,8 +22,12 @@ $trigger.click(function triggered() {
 });
 
 function successHandler(response) {
-    console.log(response);
-    var uri = "data:image/jpeg;base64," + response.data;
+    if (!response.success) {
+        alert("Face not detected");
+        return;
+    }
+    
+    var uri = createDataUri(response.data);
     var $img = $('<img/>').attr('src', uri);
     
     $img.dblclick(function () {
@@ -31,13 +35,4 @@ function successHandler(response) {
     });
     
     $('#photos').append($img);
-
-}
-
-/**
- * Strip the prefix of data url and preserve
- * only base64 data.
- */
-function extractData(dataUri) {
-    return dataUri.substring(23);
 }

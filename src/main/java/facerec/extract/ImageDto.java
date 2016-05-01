@@ -1,9 +1,9 @@
-package facerec;
+package facerec.extract;
 
 public class ImageDto {
     public final String data;
     
-    public ImageDto(String data, String method) {
+    public ImageDto(String data) {
         this.data = data;
     }
 }
