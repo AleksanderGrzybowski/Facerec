@@ -10,10 +10,10 @@ public class FaceExtractDto {
     }
     
     public static FaceExtractDto failure() {
-        return new FaceExtractDto(null, "failure");
+        return new FaceExtractDto("failure", null);
     }
     
     public static FaceExtractDto success(String base64data) {
-        return new FaceExtractDto(null, base64data);
+        return new FaceExtractDto(base64data, null);
     }
 }
