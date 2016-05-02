@@ -1,12 +1,9 @@
 *.yml
-core/recognize
-core/train
-core/extract_face
-core/photos/*
+core/bin
+core/photos
 !core/photos/.gitkeep
 
 .idea
-*.iml
 build
 .gradle
 
