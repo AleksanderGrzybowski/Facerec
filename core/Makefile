@@ -4,6 +4,8 @@ EXTRA=-ggdb --std=c++11
 
 
 all:
-	g++ $(CFLAGS) $(LIBS) $(EXTRA) train.cpp -o train 
-	g++ $(CFLAGS) $(LIBS) $(EXTRA) recognize.cpp -o recognize
-	g++ $(CFLAGS) $(LIBS) $(EXTRA) extract_face.cpp -o extract_face
+	mkdir -p bin
+	g++ $(CFLAGS) $(LIBS) $(EXTRA) train.cpp -o bin/train 
+	g++ $(CFLAGS) $(LIBS) $(EXTRA) recognize.cpp -o bin/recognize
+	g++ $(CFLAGS) $(LIBS) $(EXTRA) extract_face.cpp -o bin/extract_face
+

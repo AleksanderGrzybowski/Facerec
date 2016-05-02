@@ -12,6 +12,7 @@ public class Controller {
     public static void main(String[] args) {
         Spark.externalStaticFileLocation(Config.PUBLIC_HTML);
         Spark.secure(Config.CERT_PATH, "", null, "");
+        Spark.port(Config.PORT);
         
         Spark.post("/recognize", (req, res) -> {
             SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);

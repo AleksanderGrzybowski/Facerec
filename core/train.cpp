@@ -70,15 +70,17 @@ void load_photos(string basedir, vector<Mat>& images, vector<int>& labels) {
     cout << "Images loaded" << endl;
 }
 
-const string basedir = "photos";
-
 const vector<string> model_filenames = {"model-ef.yml", "model-ff.yml", "model-lbph.yml"};
 
 int main(int argc, const char *argv[]) {
-
+	if (argc != 2) {
+		throw runtime_error("Photo folder not given");
+	}
+	
     vector<Mat> images;
     vector<int> labels;
 
+	string basedir = string(argv[1]);
     load_photos(basedir, images, labels);
 
     Ptr<FaceRecognizer> model;
