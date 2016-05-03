@@ -7,8 +7,12 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Adapter {
+    
+    private static Logger log = Logger.getLogger(Adapter.class.getName());
     
     public static RecoStatusDto recognize(byte[] data, String method) {
         File tempFile = writeTempFile(data);
@@ -31,6 +35,7 @@ public class Adapter {
                 return RecoStatusDto.success(Integer.parseInt(line));
             }
         } catch (IOException | InterruptedException e) {
+            log.log(Level.SEVERE, "Backend error", e);
             throw new RuntimeException("Error in backend process", e);
         }
     }
@@ -55,6 +60,7 @@ public class Adapter {
                 return FaceExtractDto.success(extracted);
             }
         } catch (IOException | InterruptedException e) {
+            log.log(Level.SEVERE, "Backend error", e);
             throw new RuntimeException("Error in backend process", e);
         }
     }

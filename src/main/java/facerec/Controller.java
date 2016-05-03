@@ -6,13 +6,20 @@ import facerec.recognize.SampleDto;
 import spark.Spark;
 
 import java.util.Base64;
+import java.util.logging.Logger;
 
 public class Controller {
+    
+    private static Logger log = Logger.getLogger(Controller.class.getName());
     
     public static void main(String[] args) {
         Spark.externalStaticFileLocation(Config.PUBLIC_HTML);
         Spark.secure(Config.CERT_PATH, "", null, "");
         Spark.port(Config.PORT);
+        
+        log.info("Setting up");
+        
+        Spark.before((req, response) -> log.info(req.ip() + " " + req.url()));
         
         Spark.post("/recognize", (req, res) -> {
             SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);
