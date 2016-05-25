@@ -26,12 +26,15 @@ public class Adapter {
             Process process = new ProcessBuilder(params)
                     .directory(new File(Config.CORE_DIR))
                     .start();
+            log.info("Started reco process");
             process.waitFor();
             
             if (process.exitValue() != 0) {
+                log.info("Face not detected");
                 return RecoStatusDto.failure();
             } else {
                 String line = new BufferedReader(new InputStreamReader(process.getInputStream())).readLine();
+                log.info("Recognized as: " + line);
                 return RecoStatusDto.success(Integer.parseInt(line));
             }
         } catch (IOException | InterruptedException e) {
@@ -51,12 +54,15 @@ public class Adapter {
             Process process = new ProcessBuilder(params)
                     .directory(new File(Config.CORE_DIR))
                     .start();
+            log.info("Started face extract process");
             process.waitFor();
             
             if (process.exitValue() != 0) {
+                log.info("Face not detected");
                 return FaceExtractDto.failure();
             } else {
                 byte[] extracted = IOUtils.toByteArray(process.getInputStream());
+                log.info("Face extracted, data: " + Arrays.toString(extracted).substring(0, 10) + "...");
                 return FaceExtractDto.success(extracted);
             }
         } catch (IOException | InterruptedException e) {

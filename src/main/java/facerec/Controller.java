@@ -19,18 +19,22 @@ public class Controller {
         
         log.info("Setting up");
         
-        Spark.before((req, response) -> log.info(req.ip() + " " + req.url()));
+        Spark.before((req, response) -> log.info("Request: " + req.ip() + " " + req.url()));
         
         Spark.post("/recognize", (req, res) -> {
             SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);
+            log.info("Recognizing, method: " + dto.method + ", data: " + dto.data.substring(0, 10) + "...");
     
             return Adapter.recognize(Base64.getDecoder().decode(dto.data), dto.method);
         }, new JsonTransformer());
     
         Spark.post("/extractFace", (req, res) -> {
             ImageDto dto = new Gson().fromJson(req.body(), ImageDto.class);
+            log.info("Extracting face, data: " + dto.data.substring(0, 10) + "...");
     
             return Adapter.extractFace(Base64.getDecoder().decode(dto.data));
         }, new JsonTransformer());
+        
+        log.info("Routes all up");
     }
 }
