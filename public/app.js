@@ -30,10 +30,32 @@ $trigger.click(function triggered() {
 
 function successHandler(response) {
     if (response.success) {
-        $result.text('You are person of id = ' + response.prediction).addClass('alert-success');
+        $result.text('You are person of id = ' + mapResponse(response.prediction)).addClass('alert-success');
     } else {
         $result.text('Recognition failed, please try again').addClass('alert-danger');
     }
 
     $trigger.removeClass('disabled').text('Capture!');
+}
+
+/* FIXME: refactor this */
+
+function mapResponse(prediction) {
+    switch (prediction) {
+        case 10:
+            return 'Aleksander';
+            break;
+        case 20:
+            return 'Kasia';
+            break;
+        case 30:
+            return 'Łukasz';
+            break;
+        case 40:
+            return 'Rafał';
+            break;
+        default:
+            return '!! unknown !!';
+            break;
+    }
 }
