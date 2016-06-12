@@ -2,6 +2,7 @@ package facerec;
 
 import facerec.extract.FaceExtractDto;
 import facerec.recognize.RecoStatusDto;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -12,19 +13,24 @@ import java.util.logging.Logger;
 
 public class Adapter {
     
-    private static Logger log = Logger.getLogger(Adapter.class.getName());
+    private Logger log = Logger.getLogger(Adapter.class.getName());
+    private Configuration config;
     
-    public static RecoStatusDto recognize(byte[] data, String method) {
+    public Adapter(Configuration config) {
+        this.config = config;
+    }
+    
+    public RecoStatusDto recognize(byte[] data, String method) {
         File tempFile = writeTempFile(data);
         List<String> params = Arrays.asList(
-                Config.REGOGNIZE_BINARY_PATH,
+                config.getString("recognize_binary_path"),
                 tempFile.getAbsolutePath(),
                 method
         );
         
         try {
             Process process = new ProcessBuilder(params)
-                    .directory(new File(Config.CORE_DIR))
+                    .directory(new File(config.getString("core_dir")))
                     .start();
             log.info("Started reco process");
             process.waitFor();
@@ -43,16 +49,16 @@ public class Adapter {
         }
     }
     
-    public static FaceExtractDto extractFace(byte[] data) {
+    public FaceExtractDto extractFace(byte[] data) {
         File tempFile = writeTempFile(data);
         List<String> params = Arrays.asList(
-                Config.EXTRACT_FACE_BINARY_PATH,
+                config.getString("extract_face_binary_path"),
                 tempFile.getAbsolutePath()
         );
         
         try {
             Process process = new ProcessBuilder(params)
-                    .directory(new File(Config.CORE_DIR))
+                    .directory(new File(config.getString("core_dir")))
                     .start();
             log.info("Started face extract process");
             process.waitFor();
