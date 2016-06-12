@@ -6,6 +6,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,13 +40,19 @@ public class Adapter {
                 log.info("Face not detected");
                 return RecoStatusDto.failure();
             } else {
-                String line = new BufferedReader(new InputStreamReader(process.getInputStream())).readLine();
+                String line = readLine(process.getInputStream());
                 log.info("Recognized as: " + line);
                 return RecoStatusDto.success(Integer.parseInt(line));
             }
         } catch (IOException | InterruptedException e) {
             log.log(Level.SEVERE, "Backend error", e);
             throw new RuntimeException("Error in backend process", e);
+        }
+    }
+    
+    private String readLine(InputStream stream) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            return reader.readLine();
         }
     }
     

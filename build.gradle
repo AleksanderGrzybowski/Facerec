@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'findbugs'
 }
 
 group 'org.kelog'
@@ -24,6 +25,13 @@ jar {
         attributes(
                 'Main-Class': mainClass
         )
+    }
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }
 
