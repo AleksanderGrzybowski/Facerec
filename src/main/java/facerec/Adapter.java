@@ -30,11 +30,7 @@ public class Adapter {
         );
         
         try {
-            Process process = new ProcessBuilder(params)
-                    .directory(new File(config.getString("core_dir")))
-                    .start();
-            log.info("Started reco process");
-            process.waitFor();
+            Process process = createAndRunProcess(params);
             
             if (process.exitValue() != 0) {
                 log.info("Face not detected");
@@ -44,7 +40,7 @@ public class Adapter {
                 log.info("Recognized as: " + line);
                 return RecoStatusDto.success(Integer.parseInt(line));
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.log(Level.SEVERE, "Backend error", e);
             throw new RuntimeException("Error in backend process", e);
         }
@@ -64,11 +60,7 @@ public class Adapter {
         );
         
         try {
-            Process process = new ProcessBuilder(params)
-                    .directory(new File(config.getString("core_dir")))
-                    .start();
-            log.info("Started face extract process");
-            process.waitFor();
+            Process process = createAndRunProcess(params);
             
             if (process.exitValue() != 0) {
                 log.info("Face not detected");
@@ -78,10 +70,25 @@ public class Adapter {
                 log.info("Face extracted, data: " + Arrays.toString(extracted).substring(0, 10) + "...");
                 return FaceExtractDto.success(extracted);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.log(Level.SEVERE, "Backend error", e);
             throw new RuntimeException("Error in backend process", e);
         }
+    }
+    
+    private Process createAndRunProcess(List<String> params) throws IOException {
+        Process process = new ProcessBuilder(params)
+                .directory(new File(config.getString("core_dir")))
+                .start();
+        log.info("Started process " + params);
+        
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            throw new AssertionError(e); // can't happen here
+        }
+        
+        return process;
     }
     
     private static File writeTempFile(byte[] data) {

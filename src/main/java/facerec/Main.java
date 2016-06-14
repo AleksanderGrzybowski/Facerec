@@ -10,27 +10,30 @@ import java.util.logging.Logger;
 
 public class Main {
     
-    private static Logger log = Logger.getLogger(Main.class.getName());
+    private static final String CONFIG_FILENAME = "config.properties";
+    private static final Logger log = Logger.getLogger(Main.class.getName());
     
     public static void main(String[] args) throws Exception {
-        Configurations configs = new Configurations();
-        File propertiesFile = new File("config.properties");
-        
-        PropertiesConfiguration config = null;
+        log.info("Starting application");
+    
+        PropertiesConfiguration config;
         try {
-            config = configs.properties(propertiesFile);
+            config = new Configurations().properties(new File(CONFIG_FILENAME));
         } catch (ConfigurationException e) {
             log.log(Level.SEVERE, "Error loading config file", e);
+            throw e;
         }
     
         String envPort = System.getenv("PORT");
         if (envPort != null) {
             config.setProperty("port", Integer.parseInt(envPort));
         }
+        log.info("App will be running on port " + config.getProperty("port"));
         
         Adapter adapter = new Adapter(config);
         Controller controller = new Controller(config, adapter);
         
         controller.setupWeb();
+        log.info("Startup finished");
     }
 }
