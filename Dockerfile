@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y libopencv-calib3d2.4 libopencv-contrib2
 
 
 RUN mkdir /app
-COPY build/libs/facerec-1.0-SNAPSHOT-all.jar ssl.p12 /app/
+COPY build/libs/facerec-1.0-SNAPSHOT-all.jar config.properties ssl.p12 /app/
 COPY public /app/public
 COPY core/bin /app/core/bin
 COPY core/photos /app/core/photos
