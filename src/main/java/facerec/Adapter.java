@@ -38,7 +38,7 @@ public class Adapter {
             } else {
                 String line = readLine(process.getInputStream());
                 log.info("Recognized as: " + line);
-                return RecoStatusDto.success(Integer.parseInt(line));
+                return RecoStatusDto.success(predictionValueToName(Integer.parseInt(line)));
             }
         } catch (IOException e) {
             log.log(Level.SEVERE, "Backend error", e);
@@ -50,6 +50,11 @@ public class Adapter {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return reader.readLine();
         }
+    }
+    
+    private String predictionValueToName(int predictionValue) {
+        String name = config.getString("mapping_" + predictionValue);
+        return (name == null) ? "!! unknown !!" : name;
     }
     
     public FaceExtractDto extractFace(byte[] data) {
