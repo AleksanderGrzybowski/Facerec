@@ -24,7 +24,7 @@ public class Main {
             throw e;
         }
     
-        String envPort = System.getenv("PORT");
+        String envPort = System.getenv("FACEREC_PORT");
         if (envPort != null) {
             config.setProperty("port", Integer.parseInt(envPort));
         }

@@ -15,7 +15,7 @@ COPY core/models /app/core/models
 # hack around OpenCV, see below
 RUN ln /dev/null /dev/raw1394
 
-ENV PORT 443
+ENV FACEREC_PORT 443
 WORKDIR /app
 
 # http://stackoverflow.com/questions/31768441/how-to-persist-ln-in-docker-with-ubuntu
