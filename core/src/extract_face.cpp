@@ -11,19 +11,22 @@
 using namespace cv;
 using namespace std;
 
+#include "common.h"
 
-const string fn_haar = "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
-const int im_width = 92;
-const int im_height = 112;
+void init_rng() {
+    FILE *fp = fopen("/dev/random", "r");
+    srand(getc(fp));
+    fclose(fp);
+}
+
 
 int main(int argc, const char *argv[]) {
     if (argc != 2) {
-        throw runtime_error("Filename not given");
+        throw runtime_error("Please give parameters: <filename.jpg>");
     }
     string input_filename = string(argv[1]);
     
-    // TODO only every second!
-    srand(time(0));
+    init_rng();
 
     CascadeClassifier haar_cascade;
     haar_cascade.load(fn_haar);
@@ -45,7 +48,7 @@ int main(int argc, const char *argv[]) {
 	Mat face_resized;
 	cv::resize(face, face_resized, Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
 
-	// TODO better way
+    // not the best way, but good enough in practice
 	string output_filename = string("/tmp/extract_face") + to_string(rand() % 1000000) + ".jpg";
 	imwrite(output_filename.c_str(), face_resized);
 	

@@ -12,6 +12,9 @@
 using namespace cv;
 using namespace std;
 
+#include "common.h"
+
+
 // stolen from SO
 vector<string> list_files(string directory) {
     vector<string> list;
@@ -70,11 +73,10 @@ void load_photos(string basedir, vector<Mat>& images, vector<int>& labels) {
     cout << "Images loaded" << endl;
 }
 
-const vector<string> model_filenames = {"../models/model-ef.yml", "../models/model-ff.yml", "../models/model-lbph.yml"};
 
 int main(int argc, const char *argv[]) {
 	if (argc != 2) {
-		throw runtime_error("Photo folder not given");
+		throw runtime_error("Parameters: <photo folder>");
 	}
 	
     vector<Mat> images;

@@ -11,14 +11,12 @@
 using namespace cv;
 using namespace std;
 
+#include "common.h"
 
-const string fn_haar = "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml";
-const int im_width = 92;
-const int im_height = 112;
 
 int main(int argc, const char *argv[]) {
     if (argc != 3) {
-        throw runtime_error("Filename not given");
+        throw runtime_error("Please give parameters: <filename.jpg> <method name>");
     }
     string input_filename = string(argv[1]);
     string method = string(argv[2]);
@@ -28,13 +26,13 @@ int main(int argc, const char *argv[]) {
     
     if (method == "ef") {
     	model = createEigenFaceRecognizer();
-    	model_filename = "../models/model-ef.yml";
+    	model_filename = model_filenames[0];
     } else if (method == "ff") {
     	model = createFisherFaceRecognizer();
-    	model_filename = "../models/model-ff.yml";
+    	model_filename = model_filenames[1];
     } else if (method == "lbph") {
     	model = createLBPHFaceRecognizer();
-    	model_filename = "../models/model-lbph.yml";
+    	model_filename = model_filenames[2];
     } else {
     	throw runtime_error("Wrong method name");
     }
