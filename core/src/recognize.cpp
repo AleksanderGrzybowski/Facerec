@@ -28,13 +28,13 @@ int main(int argc, const char *argv[]) {
     
     if (method == "ef") {
     	model = createEigenFaceRecognizer();
-    	model_filename = "model-ef.yml";
+    	model_filename = "../models/model-ef.yml";
     } else if (method == "ff") {
     	model = createFisherFaceRecognizer();
-    	model_filename = "model-ff.yml";
+    	model_filename = "../models/model-ff.yml";
     } else if (method == "lbph") {
     	model = createLBPHFaceRecognizer();
-    	model_filename = "model-lbph.yml";
+    	model_filename = "../models/model-lbph.yml";
     } else {
     	throw runtime_error("Wrong method name");
     }

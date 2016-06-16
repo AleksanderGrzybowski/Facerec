@@ -15,7 +15,39 @@ repositories {
 
 def mainClass = 'facerec.Main'
 
-task run(type:JavaExec) {
+clean.doFirst {
+    delete "${rootDir}/core/bin"
+}
+
+task compileCpp(type: Exec) {
+    workingDir './core'
+    commandLine 'make'
+    inputs.dir './core/src'
+    outputs.dir './core/bin'
+}
+
+tasks.compileJava.dependsOn(compileCpp)
+
+task train(type: Exec) {
+    workingDir './core/bin'
+    commandLine './train', '../photos'
+    inputs.dir './core/photos'
+    outputs.dir './core/models'
+}
+
+tasks.train.dependsOn(compileCpp)
+tasks.compileJava.dependsOn(train)
+
+task bowerInstall(type: Exec) {
+    workingDir './public'
+    commandLine 'bower', 'install'
+    inputs.file './public/bower.json'
+    outputs.dir './public/bower_components'
+}
+
+tasks.compileJava.dependsOn(bowerInstall)
+
+task run(type: JavaExec) {
     main = mainClass
     classpath = sourceSets.main.runtimeClasspath
 }

@@ -10,6 +10,7 @@ COPY build/libs/facerec-1.0-SNAPSHOT-all.jar config.properties ssl.p12 /app/
 COPY public /app/public
 COPY core/bin /app/core/bin
 COPY core/photos /app/core/photos
+COPY core/models /app/core/models
 
 # hack around OpenCV, see below
 RUN ln /dev/null /dev/raw1394

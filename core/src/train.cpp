@@ -70,7 +70,7 @@ void load_photos(string basedir, vector<Mat>& images, vector<int>& labels) {
     cout << "Images loaded" << endl;
 }
 
-const vector<string> model_filenames = {"model-ef.yml", "model-ff.yml", "model-lbph.yml"};
+const vector<string> model_filenames = {"../models/model-ef.yml", "../models/model-ff.yml", "../models/model-lbph.yml"};
 
 int main(int argc, const char *argv[]) {
 	if (argc != 2) {
