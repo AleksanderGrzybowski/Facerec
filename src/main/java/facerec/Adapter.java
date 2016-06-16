@@ -54,7 +54,7 @@ public class Adapter {
     
     private String predictionValueToName(int predictionValue) {
         String name = config.getString("mapping_" + predictionValue);
-        return (name == null) ? "!! unknown !!" : name;
+        return (name == null) ? ("id = " + predictionValue) : name;
     }
     
     public FaceExtractDto extractFace(byte[] data) {
