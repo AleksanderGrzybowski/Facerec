@@ -1,10 +1,10 @@
 # Face recognition app
 
-This is very typical face recognition app made for Computer Vision course at Silesian University of Technology. 
+This is very typical face recognition app made for Computer Vision course at Silesian University of Technology. Professor suggested the Android platform, but it would take me a lot of time to learn it, and doing it as a web app makes it almost multiplatform. However, I tested it on my Xperia phone and Google Chrome only.
 
 Backend
 * modified recognition examples from OpenCV website in C++, extended with possibilities to pick different methods of recognition
-* HTTP API written in Java (Spark) that glues everything together
+* HTTP API written in Java (Spark microframework) that glues everything together
 * Docker is a must, cause we have ugly native dependencies
 * "fake" SSL certificate for Chrome to stop complaining
 
