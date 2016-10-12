@@ -12,3 +12,7 @@ Frontend
 * Two pieces, one for recognizing faces, and second for just extracting (useful for collecting training data)
 * Decent Webcam.js library for camera support and jQuery+Bootstrap for the rest
 
+![Screenshot 1](screenshots/1.png)
+![Screenshot 2](screenshots/2.png)
+![Screenshot 3](screenshots/3.png)
+
