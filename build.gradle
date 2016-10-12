@@ -2,6 +2,15 @@ plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     id 'findbugs'
+    id 'com.moowork.node' version '0.11'
+}
+
+def frontendDir = 'public'
+
+node {
+    version = '6.7.0'
+    download = true
+    nodeModulesDir = file("${project.projectDir}/${frontendDir}")
 }
 
 group 'org.kelog'
@@ -38,12 +47,13 @@ task train(type: Exec) {
 tasks.train.dependsOn(compileCpp)
 tasks.compileJava.dependsOn(train)
 
-task bowerInstall(type: Exec) {
-    workingDir './public'
-    commandLine 'bower', 'install'
-    inputs.file './public/bower.json'
-    outputs.dir './public/bower_components'
+task bowerInstall(type: NodeTask) {
+    workingDir = 'public/'
+    script = file("${project.projectDir}/${frontendDir}/node_modules/.bin/bower")
+    args = ['--allow-root', 'install']
+    ignoreExitValue = true
 }
+tasks.bowerInstall.dependsOn(npmInstall)
 
 tasks.compileJava.dependsOn(bowerInstall)
 
