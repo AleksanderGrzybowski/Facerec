@@ -1,11 +1,12 @@
-*.yml
-core/bin
-core/photos
-!core/photos/.gitkeep
+/photos
+!/photos/.gitkeep
+!/photos/1001
+!/photos/1002
 
 .idea
 build
 .gradle
+*.log
 
 public/bower_components/
 public/node_modules

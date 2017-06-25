@@ -14,8 +14,8 @@ public class Main {
     private static final Logger log = Logger.getLogger(Main.class.getName());
     
     public static void main(String[] args) throws Exception {
-        log.info("Starting application");
-    
+        log.info("Starting application...");
+        
         PropertiesConfiguration config;
         try {
             config = new Configurations().properties(new File(CONFIG_FILENAME));
@@ -23,7 +23,14 @@ public class Main {
             log.log(Level.SEVERE, "Error loading config file", e);
             throw e;
         }
-    
+        
+        log.info("Training model...");
+        Trainer trainer = new Trainer(config);
+        String modelFilename = trainer.train();
+        log.info("Training finished, created model file: " + modelFilename);
+        config.setProperty("model_filename", modelFilename);
+        
+        
         String envPort = System.getenv("FACEREC_PORT");
         if (envPort != null) {
             config.setProperty("port", Integer.parseInt(envPort));

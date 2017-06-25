@@ -31,9 +31,9 @@ public class Controller {
         
         Spark.post("/recognize", (req, res) -> {
             SampleDto dto = new Gson().fromJson(req.body(), SampleDto.class);
-            log.info("Recognizing, method: " + dto.method + ", data: " + dto.data.substring(0, 10) + "...");
+            log.info("Recognizing, data: " + dto.data.substring(0, 10) + "...");
     
-            return adapter.recognize(Base64.getDecoder().decode(dto.data), dto.method);
+            return adapter.recognize(Base64.getDecoder().decode(dto.data));
         }, new JsonTransformer());
     
         Spark.post("/extractFace", (req, res) -> {

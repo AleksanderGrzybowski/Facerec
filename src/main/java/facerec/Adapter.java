@@ -3,17 +3,18 @@ package facerec;
 import facerec.extract.FaceExtractDto;
 import facerec.recognize.RecoStatusDto;
 import org.apache.commons.configuration2.Configuration;
+import org.bytedeco.javacpp.DoublePointer;
+import org.bytedeco.javacpp.IntPointer;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_face.FaceRecognizer;
+import static org.bytedeco.javacpp.opencv_face.createEigenFaceRecognizer;
 import static org.bytedeco.javacpp.opencv_imgcodecs.cvSaveImage;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
@@ -22,8 +23,10 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 public class Adapter {
     
     public static final String HAAR_CLASSIFIER_PATH = "haarcascade_frontalface_alt.xml";
+    
     public static final int FINAL_WIDTH = 92;
     public static final int FINAL_HEIGHT = 112;
+    
     public static final int DEPTH = 8;
     public static final int CHANNELS = 1;
     
@@ -34,35 +37,50 @@ public class Adapter {
         this.config = config;
     }
     
-    public RecoStatusDto recognize(byte[] data, String method) {
-        File tempFile = writeTempFile(data);
-        List<String> params = Arrays.asList(
-                config.getString("recognize_binary_path"),
-                tempFile.getAbsolutePath(),
-                method
-        );
+    public RecoStatusDto recognize(byte[] data) {
+        FaceRecognizer model = createEigenFaceRecognizer();
+    
+        String modelFilename = config.getString("model_filename");
+        log.info("Loading model from " + modelFilename);
+        model.load(modelFilename);
         
-        try {
-            Process process = createAndRunProcess(params);
-            
-            if (process.exitValue() != 0) {
-                log.info("Face not detected");
-                return RecoStatusDto.failure();
-            } else {
-                String line = readLine(process.getInputStream());
-                log.info("Recognized as: " + line);
-                return RecoStatusDto.success(predictionValueToName(Integer.parseInt(line)));
-            }
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Backend error", e);
-            throw new RuntimeException("Error in backend process", e);
+        IplImage frame = new IplImage(imread(Utils.writeTempFile(data).getAbsolutePath()));
+        log.info("Image file loaded, dimensions: " + frame.width() + "x" + frame.height());
+        
+        IplImage grayFrame = convertToGrayscale(frame);
+        
+        CvSeq detectedFaces = detectFaces(grayFrame);
+        if (detectedFaces.total() == 0) {
+            log.info("No faces detected");
+            return RecoStatusDto.failure();
+        } else {
+            log.info("Face detected!");
         }
+        
+        CvRect rectangleWithDetectedFace = new CvRect(cvGetSeqElem(detectedFaces, 0));
+        
+        cvSetImageROI(grayFrame, rectangleWithDetectedFace);
+        IplImage cropped = cvCreateImage(
+                new CvSize(rectangleWithDetectedFace.width(), rectangleWithDetectedFace.height()), DEPTH, CHANNELS
+        );
+        cvCopy(grayFrame, cropped);
+        
+        IplImage resized = cvCreateImage(new CvSize(FINAL_WIDTH, FINAL_HEIGHT), DEPTH, CHANNELS);
+        cvResize(cropped, resized);
+        
+        IntPointer label = new IntPointer(1);
+        DoublePointer confidence = new DoublePointer(1);
+        model.predict(new Mat(resized), label, confidence);
+        
+        log.info("Image recognized as label " + label.get(0) + " with confidence level " + confidence.get(0));
+        
+        return RecoStatusDto.success(predictionValueToName(label.get(0)));
     }
     
-    private String readLine(InputStream stream) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
-            return reader.readLine();
-        }
+    private IplImage convertToGrayscale(IplImage frame) {
+        IplImage grayFrame = cvCreateImage(cvGetSize(frame), DEPTH, CHANNELS);
+        cvCvtColor(frame, grayFrame, CV_BGR2GRAY);
+        return grayFrame;
     }
     
     private String predictionValueToName(int predictionValue) {
@@ -71,22 +89,18 @@ public class Adapter {
     }
     
     public FaceExtractDto extractFace(byte[] data) {
-        CvHaarClassifierCascade cascadeClassifier = new CvHaarClassifierCascade(cvLoad(HAAR_CLASSIFIER_PATH));
+        IplImage frame = new IplImage(imread(Utils.writeTempFile(data).getAbsolutePath()));
+        IplImage grayFrame = convertToGrayscale(frame);
         
-        IplImage frame = new IplImage(imread(writeTempFile(data).getAbsolutePath()));
-        IplImage grayFrame = cvCreateImage(cvGetSize(frame), DEPTH, CHANNELS);
-        cvCvtColor(frame, grayFrame, CV_BGR2GRAY); 
+        CvSeq detectedFaces = detectFaces(grayFrame);
         
-        CvSeq detectedFaces = cvHaarDetectObjects(
-                grayFrame,
-                cascadeClassifier,
-                CvMemStorage.create(),
-                1.1,
-                3,
-                CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_DO_ROUGH_SEARCH
-        );
-    
-        CvRect rectangleWithDetectedFace = new CvRect(cvGetSeqElem(detectedFaces, 0)); // TODO: multiple faces
+        CvRect rectangleWithDetectedFace = new CvRect(cvGetSeqElem(detectedFaces, 0));
+        if (detectedFaces.total() == 0) {
+            log.info("No faces detected");
+            return FaceExtractDto.failure();
+        } else {
+            log.info("Face detected!");
+        }
         
         cvSetImageROI(grayFrame, rectangleWithDetectedFace);
         IplImage cropped = cvCreateImage(
@@ -97,7 +111,7 @@ public class Adapter {
         
         IplImage resized = cvCreateImage(new CvSize(FINAL_WIDTH, FINAL_HEIGHT), DEPTH, CHANNELS);
         cvResize(cropped, resized);
-    
+        
         try {
             File result = File.createTempFile("output", ".jpg");
             cvSaveImage(result.getAbsolutePath(), resized);
@@ -107,32 +121,18 @@ public class Adapter {
         }
     }
     
-    private Process createAndRunProcess(List<String> params) throws IOException {
-        Process process = new ProcessBuilder(params)
-                .directory(new File(config.getString("core_dir")))
-                .start();
-        log.info("Started process " + params);
+    private CvSeq detectFaces(IplImage grayFrame) {
+        double scaleFactor = 1.1;
+        int minNeighbors = 3;
         
-        try {
-            process.waitFor();
-        } catch (InterruptedException e) {
-            throw new AssertionError(e); // can't happen here
-        }
-        
-        return process;
+        return cvHaarDetectObjects(
+                grayFrame,
+                new CvHaarClassifierCascade(cvLoad(HAAR_CLASSIFIER_PATH)),
+                CvMemStorage.create(),
+                scaleFactor,
+                minNeighbors,
+                CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_DO_ROUGH_SEARCH
+        );
     }
     
-    private static File writeTempFile(byte[] data) {
-        try {
-            File file = File.createTempFile("facerec-tmp", ".jpg");
-            
-            FileOutputStream stream = new FileOutputStream(file.getAbsolutePath());
-            stream.write(data);
-            stream.close();
-            
-            return file;
-        } catch (Exception e) {
-            throw new AssertionError("Could not create temp file", e);
-        }
-    }
 }
