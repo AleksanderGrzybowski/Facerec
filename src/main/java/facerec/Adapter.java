@@ -3,16 +3,29 @@ package facerec;
 import facerec.extract.FaceExtractDto;
 import facerec.recognize.RecoStatusDto;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_imgcodecs.cvSaveImage;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
+import static org.bytedeco.javacpp.opencv_objdetect.*;
+
 public class Adapter {
+    
+    public static final String HAAR_CLASSIFIER_PATH = "haarcascade_frontalface_alt.xml";
+    public static final int FINAL_WIDTH = 92;
+    public static final int FINAL_HEIGHT = 112;
+    public static final int DEPTH = 8;
+    public static final int CHANNELS = 1;
     
     private Logger log = Logger.getLogger(Adapter.class.getName());
     private Configuration config;
@@ -58,26 +71,39 @@ public class Adapter {
     }
     
     public FaceExtractDto extractFace(byte[] data) {
-        File tempFile = writeTempFile(data);
-        List<String> params = Arrays.asList(
-                config.getString("extract_face_binary_path"),
-                tempFile.getAbsolutePath()
-        );
+        CvHaarClassifierCascade cascadeClassifier = new CvHaarClassifierCascade(cvLoad(HAAR_CLASSIFIER_PATH));
         
+        IplImage frame = new IplImage(imread(writeTempFile(data).getAbsolutePath()));
+        IplImage grayFrame = cvCreateImage(cvGetSize(frame), DEPTH, CHANNELS);
+        cvCvtColor(frame, grayFrame, CV_BGR2GRAY); 
+        
+        CvSeq detectedFaces = cvHaarDetectObjects(
+                grayFrame,
+                cascadeClassifier,
+                CvMemStorage.create(),
+                1.1,
+                3,
+                CV_HAAR_FIND_BIGGEST_OBJECT | CV_HAAR_DO_ROUGH_SEARCH
+        );
+    
+        CvRect rectangleWithDetectedFace = new CvRect(cvGetSeqElem(detectedFaces, 0)); // TODO: multiple faces
+        
+        cvSetImageROI(grayFrame, rectangleWithDetectedFace);
+        IplImage cropped = cvCreateImage(
+                new CvSize(rectangleWithDetectedFace.width(),
+                        rectangleWithDetectedFace.height()), DEPTH, CHANNELS
+        );
+        cvCopy(grayFrame, cropped);
+        
+        IplImage resized = cvCreateImage(new CvSize(FINAL_WIDTH, FINAL_HEIGHT), DEPTH, CHANNELS);
+        cvResize(cropped, resized);
+    
         try {
-            Process process = createAndRunProcess(params);
-            
-            if (process.exitValue() != 0) {
-                log.info("Face not detected");
-                return FaceExtractDto.failure();
-            } else {
-                byte[] extracted = IOUtils.toByteArray(process.getInputStream());
-                log.info("Face extracted, data: " + Arrays.toString(extracted).substring(0, 10) + "...");
-                return FaceExtractDto.success(extracted);
-            }
+            File result = File.createTempFile("output", ".jpg");
+            cvSaveImage(result.getAbsolutePath(), resized);
+            return FaceExtractDto.success(Files.readAllBytes(Paths.get(result.getAbsolutePath())));
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Backend error", e);
-            throw new RuntimeException("Error in backend process", e);
+            throw new RuntimeException(e);
         }
     }
     
