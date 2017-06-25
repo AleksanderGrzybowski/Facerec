@@ -25,8 +25,7 @@ public class Main {
         }
         
         log.info("Training model...");
-        Trainer trainer = new Trainer(config);
-        String modelFilename = trainer.train();
+        String modelFilename = new Trainer(config).train();
         log.info("Training finished, created model file: " + modelFilename);
         config.setProperty("model_filename", modelFilename);
         

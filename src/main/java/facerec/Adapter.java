@@ -44,7 +44,7 @@ public class Adapter {
         log.info("Loading model from " + modelFilename);
         model.load(modelFilename);
         
-        IplImage frame = new IplImage(imread(Utils.writeTempFile(data).getAbsolutePath()));
+        IplImage frame = new IplImage(imread(Utils.writeTempJpgFile(data).getAbsolutePath()));
         log.info("Image file loaded, dimensions: " + frame.width() + "x" + frame.height());
         
         IplImage grayFrame = convertToGrayscale(frame);
@@ -89,7 +89,7 @@ public class Adapter {
     }
     
     public FaceExtractDto extractFace(byte[] data) {
-        IplImage frame = new IplImage(imread(Utils.writeTempFile(data).getAbsolutePath()));
+        IplImage frame = new IplImage(imread(Utils.writeTempJpgFile(data).getAbsolutePath()));
         IplImage grayFrame = convertToGrayscale(frame);
         
         CvSeq detectedFaces = detectFaces(grayFrame);

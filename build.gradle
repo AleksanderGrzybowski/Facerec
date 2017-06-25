@@ -2,16 +2,8 @@ plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     id 'findbugs'
-    id 'com.moowork.node' version '0.11'
 }
 
-def frontendDir = 'public'
-
-node {
-    version = '6.7.0'
-    download = true
-    nodeModulesDir = file("${project.projectDir}/${frontendDir}")
-}
 
 group 'org.kelog'
 version '1.0-SNAPSHOT'
@@ -23,39 +15,6 @@ repositories {
 }
 
 def mainClass = 'facerec.Main'
-
-clean.doFirst {
-    delete "${rootDir}/core/bin"
-}
-
-task compileCpp(type: Exec) {
-    workingDir './core'
-    commandLine 'make'
-    inputs.dir './core/src'
-    outputs.dir './core/bin'
-}
-
-tasks.compileJava.dependsOn(compileCpp)
-
-task train(type: Exec) {
-    workingDir './core/bin'
-    commandLine './train', '../photos'
-    inputs.dir './core/photos'
-    outputs.dir './core/models'
-}
-
-tasks.train.dependsOn(compileCpp)
-tasks.compileJava.dependsOn(train)
-
-task bowerInstall(type: NodeTask) {
-    workingDir = 'public/'
-    script = file("${project.projectDir}/${frontendDir}/node_modules/.bin/bower")
-    args = ['--allow-root', 'install']
-    ignoreExitValue = true
-}
-tasks.bowerInstall.dependsOn(npmInstall)
-
-tasks.compileJava.dependsOn(bowerInstall)
 
 task run(type: JavaExec) {
     main = mainClass

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 public class Utils {
-    static File writeTempFile(byte[] data) {
+    static File writeTempJpgFile(byte[] data) {
         try {
             File file = File.createTempFile("facerec-tmp", ".jpg");
             

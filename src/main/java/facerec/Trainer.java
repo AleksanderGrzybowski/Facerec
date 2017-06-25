@@ -18,6 +18,7 @@ import static org.bytedeco.javacpp.opencv_face.createEigenFaceRecognizer;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 /**
+ * This is ugly as hell, but at least tries to mimick original C++ code.
  * https://github.com/bytedeco/javacv/blob/master/samples/OpenCVFaceRecognizer.java
  */
 public class Trainer {
@@ -34,15 +35,13 @@ public class Trainer {
         List<Mat> images = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
         
-        String photosDirName = config.getString("photos_dir");
-        File photosDir = new File(photosDirName);
-        if (!photosDir.isDirectory()) {
-            throw new RuntimeException("Photos dir not found, should be: " + photosDirName);
+        String photosFolderName = config.getString("photos_dir");
+        File photosFolder = new File(photosFolderName);
+        if (!photosFolder.isDirectory()) {
+            throw new RuntimeException("Photos folder not found, should be: " + photosFolderName);
         }
-        
-        File[] labeledDirs = photosDir.listFiles();
-        
-        Arrays.stream(labeledDirs)
+    
+        Arrays.stream(photosFolder.listFiles())
                 .filter(File::isDirectory)
                 .forEach(directory -> {
                     log.info("Traversing directory " + directory.getName());
@@ -63,15 +62,17 @@ public class Trainer {
     
         try {
             File modelFile = File.createTempFile("model", ".yml");
-            model.save(modelFile.getAbsolutePath());
-            log.info("Model saved to " + modelFile.getAbsolutePath());
-            return modelFile.getAbsolutePath();
+            String modelPath = modelFile.getAbsolutePath();
+            
+            model.save(modelPath);
+            log.info("Model saved to " + modelPath);
+            return modelPath;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
     
-    // this sucks
+    // this sucks even more
     private Mat prepareLabels(List<Integer> labels) {
         Mat labelsMat = new Mat(labels.size(), 1, CV_32SC1);
         IntBuffer buffer = labelsMat.createBuffer();
