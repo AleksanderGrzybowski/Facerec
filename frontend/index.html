@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Facerec</title>
+
+    <script src="webcam.min.js"></script>
+    <script src="index-bundle.js"></script>
+</head>
+
+<body>
+
+<div class="container container-fluid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div id="camera" style="width:640px; height:480px; margin: 0 auto;"></div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-xs-12">
+            <button class="btn btn-primary btn-block" id="trigger" style="font-size: 50pt;">Capture!</button>
+        </div>
+    </div>
+
+    <div class="alert" id="result-target" style="font-size: 30pt; margin-top: 20px;"></div>
+</div>
+
+</body>
+</html>
