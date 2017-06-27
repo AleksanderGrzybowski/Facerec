@@ -3,11 +3,13 @@ package facerec;
 import facerec.extract.FaceExtractDto;
 import facerec.recognize.RecoStatusDto;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.io.FileUtils;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
@@ -22,7 +24,7 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 
 public class Adapter {
     
-    public static final String HAAR_CLASSIFIER_PATH = "haarcascade_frontalface_alt.xml";
+    public static final String HAAR_CLASSIFIER_RESOURCE_NAME = "haarcascade_frontalface_alt.xml";
     
     public static final int FINAL_WIDTH = 92;
     public static final int FINAL_HEIGHT = 112;
@@ -32,14 +34,26 @@ public class Adapter {
     
     private Logger log = Logger.getLogger(Adapter.class.getName());
     private Configuration config;
+    private String haarTemporaryLocation;
     
     public Adapter(Configuration config) {
         this.config = config;
+        
+        URL resourceUrl = getClass().getResource("/" + HAAR_CLASSIFIER_RESOURCE_NAME);
+        
+        try {
+            File temporaryHaarFile = File.createTempFile("facerec-haar", ".xml");
+            FileUtils.copyURLToFile(resourceUrl, temporaryHaarFile);
+            haarTemporaryLocation = temporaryHaarFile.getAbsolutePath();
+            log.info("Haar xml file copied to temporary location " + haarTemporaryLocation);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public RecoStatusDto recognize(byte[] data) {
         FaceRecognizer model = createEigenFaceRecognizer();
-    
+        
         String modelFilename = config.getString("model_filename");
         log.info("Loading model from " + modelFilename);
         model.load(modelFilename);
@@ -127,7 +141,7 @@ public class Adapter {
         
         return cvHaarDetectObjects(
                 grayFrame,
-                new CvHaarClassifierCascade(cvLoad(HAAR_CLASSIFIER_PATH)),
+                new CvHaarClassifierCascade(cvLoad(haarTemporaryLocation)),
                 CvMemStorage.create(),
                 scaleFactor,
                 minNeighbors,
