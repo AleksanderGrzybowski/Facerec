@@ -43,5 +43,8 @@ module.exports = {
             // so this trick is required
             {from: 'node_modules/webcamjs/webcam.min.js', to: 'webcam.min.js'}
         ]),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: { warnings: false }
+        })
     ]
 };
