@@ -2,10 +2,12 @@
 
 This is very typical face recognition app made for Computer Vision course at Silesian University of Technology. Professor suggested the Android platform, but it would take me a lot of time to learn it, and doing it as a web app makes it almost multiplatform. However, I tested it on my Xperia phone and Google Chrome only.
 
+The previous version of this app was using small C++ OpenCV wrappers, that were invoked by Java backend. I decided to try to get rid of this dependency, so now I am using JavaCV native wrappers.
+
 Backend
 * modified recognition examples from OpenCV website in C++, extended with possibilities to pick different methods of recognition
 * HTTP API written in Java (Spark microframework) that glues everything together
-* Docker is a must, cause we have ugly native dependencies
+* Docker is a must, cause we *still* have ugly native dependencies
 * "fake" SSL certificate for Chrome to stop complaining
 
 Frontend
