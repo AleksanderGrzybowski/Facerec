@@ -1,5 +1,8 @@
 package facerec;
 
+import facerec.core.Adapter;
+import facerec.core.Trainer;
+import facerec.web.Controller;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;

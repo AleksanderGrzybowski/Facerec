@@ -1,11 +1,13 @@
-package facerec;
+package facerec.core;
 
-import facerec.extract.FaceExtractDto;
-import facerec.recognize.RecoStatusDto;
+import facerec.Utils;
+import facerec.dto.FaceExtractionResultDto;
+import facerec.dto.RecognitionStatusDto;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
+import org.bytedeco.javacpp.opencv_imgcodecs;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,14 +53,14 @@ public class Adapter {
         }
     }
     
-    public RecoStatusDto recognize(byte[] data) {
+    public RecognitionStatusDto recognize(byte[] data) {
         FaceRecognizer model = createEigenFaceRecognizer();
         
         String modelFilename = config.getString("model_filename");
         log.info("Loading model from " + modelFilename);
         model.load(modelFilename);
         
-        IplImage frame = new IplImage(imread(Utils.writeTempJpgFile(data).getAbsolutePath()));
+        IplImage frame = new IplImage(opencv_imgcodecs.imread(Utils.createTemporaryJpgFile(data).getAbsolutePath()));
         log.info("Image file loaded, dimensions: " + frame.width() + "x" + frame.height());
         
         IplImage grayFrame = convertToGrayscale(frame);
@@ -66,7 +68,7 @@ public class Adapter {
         CvSeq detectedFaces = detectFaces(grayFrame);
         if (detectedFaces.total() == 0) {
             log.info("No faces detected");
-            return RecoStatusDto.failure();
+            return RecognitionStatusDto.failure();
         } else {
             log.info("Face detected!");
         }
@@ -88,7 +90,7 @@ public class Adapter {
         
         log.info("Image recognized as label " + label.get(0) + " with confidence level " + confidence.get(0));
         
-        return RecoStatusDto.success(predictionValueToName(label.get(0)));
+        return RecognitionStatusDto.success(predictionValueToName(label.get(0)));
     }
     
     private IplImage convertToGrayscale(IplImage frame) {
@@ -102,8 +104,8 @@ public class Adapter {
         return (name == null) ? ("id = " + predictionValue) : name;
     }
     
-    public FaceExtractDto extractFace(byte[] data) {
-        IplImage frame = new IplImage(imread(Utils.writeTempJpgFile(data).getAbsolutePath()));
+    public FaceExtractionResultDto extractFace(byte[] data) {
+        IplImage frame = new IplImage(imread(Utils.createTemporaryJpgFile(data).getAbsolutePath()));
         IplImage grayFrame = convertToGrayscale(frame);
         
         CvSeq detectedFaces = detectFaces(grayFrame);
@@ -111,7 +113,7 @@ public class Adapter {
         CvRect rectangleWithDetectedFace = new CvRect(cvGetSeqElem(detectedFaces, 0));
         if (detectedFaces.total() == 0) {
             log.info("No faces detected");
-            return FaceExtractDto.failure();
+            return FaceExtractionResultDto.failure();
         } else {
             log.info("Face detected!");
         }
@@ -129,7 +131,7 @@ public class Adapter {
         try {
             File result = File.createTempFile("output", ".jpg");
             cvSaveImage(result.getAbsolutePath(), resized);
-            return FaceExtractDto.success(Files.readAllBytes(Paths.get(result.getAbsolutePath())));
+            return FaceExtractionResultDto.success(Files.readAllBytes(Paths.get(result.getAbsolutePath())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

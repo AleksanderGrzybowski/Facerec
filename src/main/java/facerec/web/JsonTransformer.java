@@ -1,4 +1,4 @@
-package facerec;
+package facerec.web;
 
 import com.google.gson.Gson;
 import spark.ResponseTransformer;

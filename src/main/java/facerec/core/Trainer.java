@@ -1,4 +1,4 @@
-package facerec;
+package facerec.core;
 
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.bytedeco.javacpp.opencv_core.Mat;

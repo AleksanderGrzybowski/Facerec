@@ -1,17 +1,14 @@
 package facerec;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class Utils {
-    static File writeTempJpgFile(byte[] data) {
+    public static File createTemporaryJpgFile(byte[] data) {
         try {
             File file = File.createTempFile("facerec-tmp", ".jpg");
-            
-            FileOutputStream stream = new FileOutputStream(file.getAbsolutePath());
-            stream.write(data);
-            stream.close();
-            
+            FileUtils.writeByteArrayToFile(file, data);
             return file;
         } catch (Exception e) {
             throw new AssertionError("Could not create temp file", e);
