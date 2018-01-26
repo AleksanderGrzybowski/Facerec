@@ -22,7 +22,9 @@ public class Controller {
     
     public void setupWeb() {
         Spark.externalStaticFileLocation(publicHtmlPath);
-        Spark.secure(sslCertificatePath, "", null, "");
+        if (sslCertificatePath != null) {
+            Spark.secure(sslCertificatePath, "", null, "");
+        }
         Spark.port(port);
         
         log.info("Setting up...");

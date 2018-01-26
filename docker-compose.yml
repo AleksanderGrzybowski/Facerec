@@ -4,5 +4,5 @@ services:
     image: facerec
     build: .
     ports:
-      - 61934:443
+      - 61934:8080
     restart: always
