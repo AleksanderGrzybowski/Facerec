@@ -1,49 +1,55 @@
 package facerec.web;
 
 import com.google.gson.Gson;
-import facerec.core.Adapter;
+import facerec.core.FaceService;
 import facerec.dto.FaceExtrationImageDto;
 import facerec.dto.RecognitionSampleDto;
-import org.apache.commons.configuration2.Configuration;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import spark.ResponseTransformer;
 import spark.Spark;
 
 import java.util.Base64;
-import java.util.logging.Logger;
 
+@Log
+@RequiredArgsConstructor
 public class Controller {
     
-    private Adapter adapter;
-    private Logger log = Logger.getLogger(Controller.class.getName());
-    private Configuration config;
-    
-    public Controller(Configuration config, Adapter adapter) {
-        this.config = config;
-        this.adapter = adapter;
-    }
+    private final FaceService faceService;
+    private final String publicHtmlPath;
+    private final String sslCertificatePath;
+    private final int port;
     
     public void setupWeb() {
-        Spark.externalStaticFileLocation(config.getString("public_html"));
-        Spark.secure(config.getString("cert_path"), "", null, "");
-        Spark.port(config.getInt("port"));
+        Spark.externalStaticFileLocation(publicHtmlPath);
+        Spark.secure(sslCertificatePath, "", null, "");
+        Spark.port(port);
         
-        log.info("Setting up");
+        log.info("Setting up...");
         
         Spark.before((request, response) -> log.info("Request: " + request.ip() + " " + request.url()));
+        
+        ResponseTransformer jsonTransformer = createJsonTransformer();
         
         Spark.post("/recognize", (request, response) -> {
             RecognitionSampleDto dto = new Gson().fromJson(request.body(), RecognitionSampleDto.class);
             log.info("Recognizing, data: " + dto.data.substring(0, 10) + "...");
             
-            return adapter.recognize(Base64.getDecoder().decode(dto.data));
-        }, new JsonTransformer());
+            return faceService.recognize(Base64.getDecoder().decode(dto.data));
+        }, jsonTransformer);
         
         Spark.post("/extractFace", (request, response) -> {
             FaceExtrationImageDto dto = new Gson().fromJson(request.body(), FaceExtrationImageDto.class);
             log.info("Extracting face, data: " + dto.data.substring(0, 10) + "...");
             
-            return adapter.extractFace(Base64.getDecoder().decode(dto.data));
-        }, new JsonTransformer());
+            return faceService.extractFace(Base64.getDecoder().decode(dto.data));
+        }, jsonTransformer);
         
-        log.info("Routes all up");
+        log.info("Routes all up.");
+    }
+    
+    private ResponseTransformer createJsonTransformer() {
+        Gson gson = new Gson();
+        return gson::toJson;
     }
 }

@@ -1,6 +1,6 @@
 package facerec.core;
 
-import org.apache.commons.configuration2.PropertiesConfiguration;
+import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 
@@ -21,26 +21,22 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
  * This is ugly as hell, but at least tries to mimick original C++ code.
  * https://github.com/bytedeco/javacv/blob/master/samples/OpenCVFaceRecognizer.java
  */
+@RequiredArgsConstructor
 public class Trainer {
     
-    private PropertiesConfiguration config;
+    private final String photosDirectory;
     private Logger log = Logger.getLogger(Trainer.class.getName());
-    
-    public Trainer(PropertiesConfiguration config) {
-        this.config = config;
-    }
     
     @SuppressWarnings("ConstantConditions")
     public String train() {
         List<Mat> images = new ArrayList<>();
         List<Integer> labels = new ArrayList<>();
-        
-        String photosFolderName = config.getString("photos_dir");
-        File photosFolder = new File(photosFolderName);
-        if (!photosFolder.isDirectory()) {
-            throw new RuntimeException("Photos folder not found, should be: " + photosFolderName);
-        }
     
+        File photosFolder = new File(photosDirectory);
+        if (!photosFolder.isDirectory()) {
+            throw new RuntimeException("Photos folder not found, should be: " + photosDirectory);
+        }
+        
         Arrays.stream(photosFolder.listFiles())
                 .filter(File::isDirectory)
                 .forEach(directory -> {
@@ -59,7 +55,7 @@ public class Trainer {
         
         FaceRecognizer model = createEigenFaceRecognizer();
         model.train(matVector, labelsMat);
-    
+        
         try {
             File modelFile = File.createTempFile("model", ".yml");
             String modelPath = modelFile.getAbsolutePath();

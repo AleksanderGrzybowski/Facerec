@@ -1,15 +1,13 @@
 package facerec.dto;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Base64;
 
+@RequiredArgsConstructor
 public class FaceExtractionResultDto {
-    public final String data;
     public final boolean success;
-    
-    private FaceExtractionResultDto(boolean success, String data) {
-        this.success = success;
-        this.data = data;
-    }
+    public final String data;
     
     public static FaceExtractionResultDto failure() {
         return new FaceExtractionResultDto(false, null);
