@@ -28,4 +28,4 @@ WORKDIR /app
 RUN sed -i -e '/public_html=/c\public_html=public' config.properties
 RUN sed -i -e '/cert_path=/c\cert_path_is=disabled' config.properties
 
-CMD sh -c "ln -s /dev/null /dev/raw1394; java -jar facerec-1.0-SNAPSHOT-all.jar"
+CMD sh -c "ln -s /dev/null /dev/raw1394; java -Xmx150m -jar facerec-1.0-SNAPSHOT-all.jar"
