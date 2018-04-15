@@ -46,6 +46,8 @@ public class Controller {
             
             return faceService.extractFace(Base64.getDecoder().decode(dto.data));
         }, jsonTransformer);
+    
+        Spark.get("/health", ((request, response) -> new HealthcheckOkDto()) , createJsonTransformer());
         
         log.info("Routes all up.");
     }
@@ -53,5 +55,10 @@ public class Controller {
     private ResponseTransformer createJsonTransformer() {
         Gson gson = new Gson();
         return gson::toJson;
+    }
+    
+    @SuppressWarnings("unused")
+    private class HealthcheckOkDto {
+        public final String status = "OK";
     }
 }
